@@ -27,22 +27,26 @@ import torch.nn as nn
 import torch.nn.functional as F
 from nbdt.models.utils import get_pretrained_model
 
-__all__ = ('MPL75')
+__all__ = ('MPL19')
 
-class MLP(Module):
+model_urls = {
+('MLP19', 'IDS2017'): 'https://github.com/Kubernet2020/Explainability-for-model/blob/main/Bofan/feature19_classes13_lr001_batch10000.pth'
+}
+
+class MLP19(Module):
     # define model elements
     def __init__(self, n_inputs):
         super(MLP, self).__init__()
         # input to first hidden layer
-        self.hidden1 = Linear(n_inputs, 76)
+        self.hidden1 = Linear(n_inputs, 20)
         kaiming_uniform_(self.hidden1.weight, nonlinearity='relu')
         self.act1 = ReLU()
         # second hidden layer
-        self.hidden2 = Linear(76, 76)
+        self.hidden2 = Linear(20, 20)
         kaiming_uniform_(self.hidden2.weight, nonlinearity='relu')
         self.act2 = ReLU()
         # third hidden layer and output
-        self.hidden3 = Linear(76, 10)
+        self.hidden3 = Linear(20, 13)
         xavier_uniform_(self.hidden3.weight)
         self.act3 = Softmax(dim=1)
 
@@ -58,13 +62,13 @@ class MLP(Module):
         # output layer
         X = self.hidden3(X)
         X = self.act3(X)
-
         return X
-def _MPL75(arch, *args, pretrained=False, progress=True, dataset='CIFAR10', **kwargs):
-    model = MLP(75)
-    model = get_pretrained_model(arch, dataset, model, model_urls='https://github.com/Bofan1120/IDS_basic/blob/master/IDS2017/2.pth',
+
+def _MPL19(arch, *args, pretrained=False, progress=True, dataset='IDS2017', **kwargs):
+    model = MLP(19)
+    model = get_pretrained_model(arch, dataset, model, model_urls,
         pretrained=pretrained, progress=progress)
     return model
 
-def MPL75(pretrained=False, progress=True, **kwargs):
-    return _MPL75('MPL75', pretrained=pretrained, progress=progress, **kwargs)
+def MPL19(pretrained=False, progress=True, **kwargs):
+    return _MPL19('MPL19', pretrained=pretrained, progress=progress, **kwargs)
